@@ -1,0 +1,40 @@
+:root {
+    --surface-input: #0f172a;
+    --border-input: #334155;
+    --border-focus: #38bdf8;
+}
+
+.input-field {
+    background-color: var(--surface-input);
+    border: 1px solid var(--border-input);
+    color: #f8fafc;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.tab-btn {
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn--active-login {
+    color: #34d399;
+    border-bottom-color: #34d399;
+}
+
+.tab-btn--active-register {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+}
+
+.product-card {
+    transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.product-card:hover {
+    border-color: #475569;
+}

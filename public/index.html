@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Isekai Items — Gestión de Productos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6">
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-5 mb-8 border-b border-slate-800">
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-amber-400">
+                    The Isekai Items
+                </h1>
+                <p class="text-slate-400 text-sm mt-1">
+                    Gestión de inventario con autenticación JWT y control de acceso por roles
+                </p>
+            </div>
+            <div id="authStatus" class="flex items-center gap-3 text-sm"></div>
+        </header>
+
+        <!-- Notificación global para respuestas de API -->
+        <div id="globalAlert" class="hidden mb-6 rounded-lg border px-4 py-3 text-sm font-medium" role="alert"></div>
+
+        <!-- Panel de autenticación (visible solo sin sesión activa) -->
+        <section id="authSection" class="max-w-md mx-auto bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="grid grid-cols-2 border-b border-slate-800 mb-5">
+                <button type="button" id="tabLogin" class="tab-btn tab-btn--active-login pb-3 text-sm font-semibold transition">
+                    Iniciar sesión
+                </button>
+                <button type="button" id="tabRegister" class="tab-btn pb-3 text-sm font-semibold text-slate-400 hover:text-slate-200 transition">
+                    Registrarse
+                </button>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="loginEmail" class="block text-sm font-medium text-slate-300 mb-1">Correo electrónico</label>
+                    <input type="email" id="loginEmail" required autocomplete="email"
+                        placeholder="usuario@isekai.com"
+                        class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label for="loginPassword" class="block text-sm font-medium text-slate-300 mb-1">Contraseña</label>
+                    <input type="password" id="loginPassword" required autocomplete="current-password"
+                        placeholder="••••••••"
+                        class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                </div>
+                <button type="submit" id="btnLogin"
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 font-semibold py-2.5 rounded-lg text-sm transition">
+                    Entrar
+                </button>
+            </form>
+
+            <form id="registerForm" class="space-y-4 hidden">
+                <div>
+                    <label for="regNombre" class="block text-sm font-medium text-slate-300 mb-1">Nombre completo</label>
+                    <input type="text" id="regNombre" required minlength="2" autocomplete="name"
+                        placeholder="Kazuma Satou"
+                        class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label for="regEmail" class="block text-sm font-medium text-slate-300 mb-1">Correo electrónico</label>
+                    <input type="email" id="regEmail" required autocomplete="email"
+                        placeholder="aventurero@isekai.com"
+                        class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label for="regPassword" class="block text-sm font-medium text-slate-300 mb-1">Contraseña (mín. 6 caracteres)</label>
+                    <input type="password" id="regPassword" required minlength="6" autocomplete="new-password"
+                        placeholder="••••••••"
+                        class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                </div>
+                <button type="submit" id="btnRegister"
+                    class="w-full bg-sky-600 hover:bg-sky-500 active:bg-sky-700 font-semibold py-2.5 rounded-lg text-sm transition">
+                    Crear cuenta de cliente
+                </button>
+            </form>
+
+            <p id="authFeedback" class="hidden text-sm mt-4 text-center rounded-lg px-3 py-2"></p>
+        </section>
+
+        <!-- Panel principal protegido (visible solo con token JWT válido) -->
+        <main id="appContent" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Formulario CRUD exclusivo para rol admin -->
+            <section id="adminPanel" class="hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl h-fit">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="formTitle" class="text-lg font-semibold text-emerald-400">Nuevo artículo</h2>
+                    <span class="text-xs uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        Admin
+                    </span>
+                </div>
+
+                <form id="productForm" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-slate-300 mb-1">Nombre</label>
+                        <input type="text" id="nombre" required minlength="2" maxlength="120"
+                            placeholder="Espada Sagrada Excalibur"
+                            class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="descripcion" class="block text-sm font-medium text-slate-300 mb-1">Descripción</label>
+                        <textarea id="descripcion" rows="3" required minlength="3" maxlength="500"
+                            placeholder="Descripción detallada del artículo..."
+                            class="input-field w-full rounded-lg px-3 py-2 text-sm resize-none"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="precio" class="block text-sm font-medium text-slate-300 mb-1">Precio (MXN)</label>
+                            <input type="number" id="precio" required min="0" step="0.01"
+                                placeholder="450.00"
+                                class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                        </div>
+                        <div>
+                            <label for="stock" class="block text-sm font-medium text-slate-300 mb-1">Stock</label>
+                            <input type="number" id="stock" min="0" step="1" value="1"
+                                class="input-field w-full rounded-lg px-3 py-2 text-sm">
+                        </div>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" id="btnGuardar"
+                            class="flex-1 bg-emerald-600 hover:bg-emerald-500 font-semibold py-2 rounded-lg text-sm transition">
+                            Guardar
+                        </button>
+                        <button type="button" id="btnCancelar"
+                            class="hidden bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-medium transition">
+                            Cancelar
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Listado de productos -->
+            <section id="listContainer" class="lg:col-span-3 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
+                    <div>
+                        <h2 class="text-lg font-semibold text-sky-400">Inventario actual</h2>
+                        <p id="productCount" class="text-xs text-slate-400 mt-0.5">0 artículos</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="search" id="searchInput" placeholder="Filtrar por nombre..."
+                            class="input-field rounded-lg px-3 py-1.5 text-sm w-full sm:w-56">
+                        <button type="button" id="btnRefresh"
+                            class="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-200 transition">
+                            Recargar
+                        </button>
+                    </div>
+                </div>
+
+                <div id="productList" class="space-y-3">
+                    <p class="text-slate-500 text-sm">Cargando inventario...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
