@@ -2,6 +2,10 @@
 
 Aplicación web Full Stack para la gestión de inventario de artículos de anime/isekai construida con **Node.js**, **Express**, **MongoDB Atlas (Mongoose)**, **JWT**, **bcryptjs**, **express-validator** y **Tailwind CSS**. Incluye control de acceso basado en roles (RBAC), vista estática integrada, pruebas unitarias con **Jest + Supertest** (mocks) y pipeline de **CI/CD** con GitHub Actions y despliegue en **Vercel**.
 
+- **Aplicación en producción (Vercel):** https://actividad-4-kohl.vercel.app
+- **Health check de la API:** https://actividad-4-kohl.vercel.app/api/health
+- **Repositorio en GitHub:** https://github.com/El-Vicobra/Actividad-4
+
 ---
 
 ## Stack tecnológico
@@ -70,8 +74,8 @@ Relación **1:N** entre `usuarios` y `productos` mediante el campo `creadoPor` (
 ### 1. Clonar e instalar dependencias
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
-cd <CARPETA_DEL_PROYECTO>
+git clone https://github.com/El-Vicobra/Actividad-4.git
+cd Actividad-4
 npm install
 ```
 
